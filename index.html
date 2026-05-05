@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 03 — Sopros e Bulhas Cardíacas · IPEDC</title>
+<style>
+  :root {
+    --navy:   #1A2B3C;
+    --red:    #C0392B;
+    --gold:   #D4AC0D;
+    --blue:   #1A5276;
+    --green:  #1E8449;
+    --bg:     #F4F6F9;
+    --card:   #FFFFFF;
+    --txt:    #1A1A2E;
+    --muted:  #6B7280;
+    --border: #E2E8F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--txt); }
+  header { background: var(--navy); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #fff; }
+  .logo-text h1 { color: #fff; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+  .logo-text p  { color: #8ab4d4; font-size: 10px; letter-spacing: 1.5px; margin-top: 2px; text-transform: uppercase; }
+  .aula-badge { background: var(--gold); color: var(--navy); padding: 6px 18px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, #2c4a6e 60%, #3d6b9e 100%); padding: 32px 40px; }
+  .hero-num { color: var(--gold); font-size: 64px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .hero h2 { color: #fff; font-size: 28px; font-weight: 800; }
+  .hero p  { color: #b8d4ea; font-size: 14px; margin-top: 6px; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .htag { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 4px 14px; color: #fff; font-size: 11px; font-weight: 600; }
+  .tab-bar { background: var(--navy); border-bottom: 3px solid var(--red); display: flex; flex-wrap: wrap; padding: 0 24px; overflow-x: auto; }
+  .tab-btn { padding: 14px 20px; color: #8ab4d4; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -3px; white-space: nowrap; transition: all 0.2s; background: none; border-left: none; border-right: none; border-top: none; }
+  .tab-btn:hover { color: #fff; }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-content { display: none; max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  .tab-content.active { display: block; }
+  .sec-title { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .sec-num { width: 38px; height: 38px; border-radius: 8px; background: var(--red); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 900; flex-shrink: 0; }
+  .sec-title h2 { font-size: 22px; font-weight: 800; color: var(--navy); }
+  .sec-title p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .card { background: var(--card); border-radius: 14px; box-shadow: 0 2px 12px rgba(26,43,60,0.08); overflow: hidden; margin-bottom: 20px; }
+  .card-head { padding: 14px 20px; display: flex; align-items: center; gap: 10px; background: var(--navy); }
+  .card-head h3 { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .card-head.red  { background: var(--red); }
+  .card-head.blue { background: var(--blue); }
+  .card-head.green{ background: var(--green); }
+  .card-head.gold { background: #7D6608; }
+  .card-body { padding: 20px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .vs-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(26,43,60,0.08); }
+  .vs-col { background: var(--card); padding: 20px; }
+  .vs-col.left { border-right: 1px solid var(--border); }
+  .vs-divider { background: var(--navy); display: flex; align-items: center; justify-content: center; padding: 0 12px; color: #fff; font-weight: 900; font-size: 14px; writing-mode: vertical-rl; letter-spacing: 2px; }
+  .vs-head { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .vs-sub  { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 14px; }
+  .vs-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; font-size: 14px; }
+  .vs-item::before { content: "u25B6"; font-size: 10px; color: var(--red); margin-top: 3px; flex-shrink: 0; }
+  .vs-mnemonic { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+  .vs-col.left .vs-mnemonic  { background: #FDEDEC; color: var(--red); }
+  .vs-col.right .vs-mnemonic { background: #EBF5FB; color: var(--blue); }
+  .alert { border-left: 5px solid var(--red); background: #FDEDEC; padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 16px 0; font-size: 13px; font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 10px; }
+  .alert.gold  { border-color: var(--gold); background: #FEF9E7; color: #7D6608; }
+  .alert.green { border-color: var(--green); background: #EAFAF1; color: var(--green); }
+  .alert.blue  { border-color: var(--blue); background: #EBF5FB; color: var(--blue); }
+  .proto-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .proto-step { background: var(--card); border-radius: 12px; box-shadow: 0 2px 8px rgba(26,43,60,0.08); overflow: hidden; }
+  .proto-num { padding: 10px; text-align: center; font-size: 28px; font-weight: 900; color: #fff; }
+  .n1 { background: var(--red); } .n2 { background: var(--blue); } .n3 { background: var(--green); } .n4 { background: #7D6608; }
+  .proto-body { padding: 14px; }
+  .proto-body h4 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .proto-body p  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .grau-table { width: 100%; border-collapse: collapse; }
+  .grau-table th { background: var(--navy); color: #fff; padding: 10px 14px; font-size: 12px; font-weight: 700; text-align: left; }
+  .grau-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .grau-table tr:last-child td { border-bottom: none; }
+  .grau-low  { background: #EEF2F7; }
+  .grau-high { background: #FDEDEC; }
+  .grau-num  { font-weight: 800; font-size: 16px; }
+  .fremito-yes { color: var(--red); font-weight: 700; }
+  .fremito-no  { color: var(--muted); }
+  .valva-table { width: 100%; border-collapse: collapse; }
+  .valva-table th { padding: 12px 16px; font-size: 12px; font-weight: 700; color: #fff; text-align: center; }
+  .valva-table td { padding: 12px 16px; font-size: 14px; text-align: center; border-bottom: 1px solid var(--border); font-weight: 600; }
+  .valva-table tr:last-child td { border-bottom: none; }
+  .sinal-row { display: grid; grid-template-columns: 220px 1fr auto; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .sinal-row:last-child { border-bottom: none; }
+  .sinal-name { font-weight: 700; font-size: 14px; color: var(--navy); }
+  .sinal-loc  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .sinal-desc { font-size: 13px; color: var(--txt); }
+  .sinal-memo { background: #EBF5FB; color: var(--blue); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; font-style: italic; }
+  .prontuario-block { background: var(--navy); border-radius: 10px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 14px; color: #E8F4FD; line-height: 1.8; border-left: 5px solid var(--gold); }
+  .prontuario-block .label { color: var(--gold); font-weight: 700; }
+  .resumao-list { list-style: none; }
+  .resumao-list li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .resumao-list li:last-child { border-bottom: none; }
+  .resumao-num { width: 30px; height: 30px; border-radius: 6px; background: var(--red); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid var(--border); background: var(--card); color: var(--muted); transition: all 0.2s; }
+  .filter-btn.on { border-color: var(--navy); background: var(--navy); color: #fff; }
+  .fc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+  .fc-wrap { perspective: 800px; height: 160px; cursor: pointer; }
+  .fc-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.45s ease; border-radius: 12px; }
+  .fc-wrap.flipped .fc-inner { transform: rotateY(180deg); }
+  .fc-front, .fc-back { position: absolute; inset: 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; backface-visibility: hidden; text-align: center; }
+  .fc-front { background: var(--navy); color: #fff; border-bottom: 4px solid var(--gold); }
+  .fc-front .fc-tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; }
+  .fc-front .fc-q   { font-size: 15px; font-weight: 600; line-height: 1.4; }
+  .fc-back { background: var(--card); color: var(--txt); transform: rotateY(180deg); border: 2px solid var(--border); border-bottom: 4px solid var(--green); }
+  .fc-back .fc-a { font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--navy); }
+  .fc-hint { font-size: 11px; color: var(--muted); position: absolute; bottom: 10px; right: 14px; }
+  footer { background: var(--navy); color: #8ab4d4; text-align: center; padding: 20px; font-size: 11px; margin-top: 40px; }
+  @media (max-width: 700px) {
+    .grid2, .proto-grid { grid-template-columns: 1fr; }
+    .vs-grid { grid-template-columns: 1fr; }
+    .vs-divider { writing-mode: horizontal-tb; padding: 10px; }
+    .vs-col.left { border-right: none; border-bottom: 1px solid var(--border); }
+    .sinal-row { grid-template-columns: 1fr; }
+    header { padding: 16px 20px; flex-direction: column; }
+    .hero { padding: 24px 20px; }
+    .hero-num { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-area">
+    <div class="logo-circle">IP</div>
+    <div class="logo-text">
+      <h1>IPEDC</h1>
+      <p>Instituto de Propedeutica e Educacao em Doencas Cardiovasculares</p>
+    </div>
+  </div>
+  <div class="aula-badge">AULA 03 &middot; PROPEDEUTICA MEDICA</div>
+</header>
+<div class="hero">
+  <div class="hero-num">03</div>
+  <h2>Analise Sistematica do Exame Fisico Cardiovascular</h2>
+  <p>Sopros e Bulhas Cardiacas &mdash; Material de Estudo Pos-Aula</p>
+  <div class="hero-tags">
+    <span class="htag">Estetoscopio</span>
+    <span class="htag">Bulhas B1&ndash;B4</span>
+    <span class="htag">Protocolo 4 Passos</span>
+    <span class="htag">Graduacao 1&ndash;6</span>
+    <span class="htag">Fisiopatologia</span>
+    <span class="htag">IA: Sinais Perifericos</span>
+    <span class="htag">Prontuario</span>
+    <span class="htag">35 Flashcards</span>
+  </div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('resumo',this)">&#128203; Resumao</button>
+  <button class="tab-btn" onclick="showTab('estet',this)">&#128266; Estetoscopio</button>
+  <button class="tab-btn" onclick="showTab('bulhas',this)">&#10084; Bulhas</button>
+  <button class="tab-btn" onclick="showTab('proto',this)">&#128208; 4 Passos</button>
+  <button class="tab-btn" onclick="showTab('fisio',this)">&#9881; Fisiopatologia</button>
+  <button class="tab-btn" onclick="showTab('ia',this)">&#129728; Insuf. Aortica</button>
+  <button class="tab-btn" onclick="showTab('pront',this)">&#128221; Prontuario</button>
+  <button class="tab-btn" onclick="showTab('flash',this)">&#127183; Flashcards</button>
+</div>
+
+<!-- RESUMAO -->
+<div id="tab-resumo" class="tab-content active">
+  <div class="sec-title">
+    <div class="sec-num">&#10003;</div>
+    <div><h2>6 Regras de Ouro desta Aula</h2><p>Tudo que cai em prova &mdash; aprenda, treine, aplique</p></div>
+  </div>
+  <ul class="resumao-list">
+    <li><div class="resumao-num">1</div><div><strong>Palpe o pulso enquanto ausculta</strong> &rarr; define sistolico vs diastolico. O que coincide com o pulso e sistolico (pulso = B1 = inicio da sistole).</div></li>
+    <li><div class="resumao-num">2</div><div><strong>Manobra de Rivero-Carvalho</strong> &rarr; define camara D ou E. Inspiracao amplifica sons direitos (D) &middot; Expiracao amplifica sons esquerdos (E).</div></li>
+    <li><div class="resumao-num">3</div><div><strong>Fremito palpavel = sopro MINIMO 4/6</strong>. Sem fremito = sopro 3/6 ou menos. Nunca diga 4/6 sem fremito.</div></li>
+    <li><div class="resumao-num">4</div><div><strong>Fibrilacao Atrial = SEM sistole atrial = SEM B4</strong>, sempre, sem excecao. FA elimina a contracao atrial que gera B4.</div></li>
+    <li><div class="resumao-num">5</div><div><strong>Insuficiencia / Regurgitacao = DIAFRAGMA</strong> (som de alta freq.) &middot; <strong>Estenose = CAMPANULA</strong> (som de baixa freq.).</div></li>
+    <li><div class="resumao-num">6</div><div><strong>5 sinais perifericos da IA:</strong> Musset (cabeca) &middot; Miller (uvula) &middot; Kink (ungueal) &middot; Martelo d'Agua (pulso) &middot; Shotgun (femoral).</div></li>
+  </ul>
+  <div class="alert gold" style="margin-top:24px;">
+    <span style="font-size:18px;">&#128161;</span>
+    Modelo no prontuario: <em>"AC: RCR 2T, BNF, com sopro sistolico em foco mitral 3+/6, sem fremito. AP: MVU, s/RA."</em>
+  </div>
+</div>
+
+<!-- ESTETOSCOPIO -->
+<div id="tab-estet" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">1</div>
+    <div><h2>O Estetoscopio: Campanula vs Diafragma</h2><p>Escolha a peca certa antes de auscultar</p></div>
+  </div>
+  <div class="vs-grid">
+    <div class="vs-col left">
+      <div class="vs-head" style="color:var(--red);">&#128308; Campanula</div>
+      <div class="vs-sub">Peca MENOR</div>
+      <div class="vs-item">Sons de BAIXA frequencia</div>
+      <div class="vs-item">B3 e B4 (bulhas acessorias)</div>
+      <div class="vs-item">Sopros EJETIVOS (estenose)</div>
+      <div class="vs-item">Pressao leve sobre a pele</div>
+      <div class="vs-mnemonic">&#128161; CAMPANULA = CANTINHO<br><span style="font-weight:400">(sons que precisam de silencio e atencao)</span></div>
+    </div>
+    <div class="vs-divider">VS</div>
+    <div class="vs-col right">
+      <div class="vs-head" style="color:var(--blue);">&#128309; Diafragma</div>
+      <div class="vs-sub">Peca MAIOR</div>
+      <div class="vs-item">Sons de ALTA frequencia</div>
+      <div class="vs-item">B1 e B2 (bulhas normais)</div>
+      <div class="vs-item">Sopros de REGURGITACAO</div>
+      <div class="vs-item">Pressao firme sobre a pele</div>
+      <div class="vs-mnemonic">&#128161; DIAFRAGMA = o DESTAQUE<br><span style="font-weight:400">(sons mais intensos e faceis)</span></div>
+    </div>
+  </div>
+  <div class="alert" style="margin-top:24px;">
+    <span style="font-size:18px;">&#9888;</span>
+    Erro comum: usar o diafragma para tentar ouvir B3/B4. Voce nao vai ouvir. Troque para a campanula e reduza a pressao.
+  </div>
+</div>
+
+<!-- BULHAS -->
+<div id="tab-bulhas" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">2</div>
+    <div><h2>As Bulhas Cardiacas</h2><p>B1, B2, B3 e B4 &mdash; origem, momento e significado</p></div>
+  </div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-head"><h3>Linha do tempo do ciclo cardiaco</h3></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:8px;background:#EEF2F7;border-radius:12px;padding:12px;overflow-x:auto;flex-wrap:wrap;">
+        <div style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;">SISTOLE</div>
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--red);display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:13px;">B1</div>
+        <div style="flex:1;height:4px;background:var(--red);border-radius:2px;min-width:20px;"></div>
+        <div style="background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;">DIASTOLE</div>
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:13px;">B2</div>
+        <div style="width:38px;height:38px;border-radius:50%;background:#1E8449;display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:13px;">B3</div>
+        <div style="flex:2;height:4px;background:var(--blue);border-radius:2px;min-width:20px;"></div>
+        <div style="width:38px;height:38px;border-radius:50%;background:#7D6608;display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:13px;">B4</div>
+        <div style="flex:0.5;height:4px;background:var(--blue);border-radius:2px;min-width:10px;"></div>
+        <div style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;">SISTOLE</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head red"><h3>B1 &mdash; Inicio da Sistole</h3></div>
+      <div class="card-body">
+        <p style="font-size:13px;margin-bottom:10px;">Fechamento das valvas <strong>Mitral + Tricuspide</strong></p>
+        <div class="alert green" style="margin:0;font-size:12px;"><span>&#10003;</span> Coincide com o PULSO carotideo</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">Som: "TUM" (mais grave e prolongado)</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head blue"><h3>B2 &mdash; Inicio da Diastole</h3></div>
+      <div class="card-body">
+        <p style="font-size:13px;margin-bottom:10px;">Fechamento das valvas <strong>Aortica + Pulmonar</strong></p>
+        <div class="alert" style="margin:0;font-size:12px;"><span>&#10007;</span> NAO coincide com o pulso</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">Som: "TA" (mais agudo e seco)</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head green"><h3>B3 &mdash; Protodiástole</h3></div>
+      <div class="card-body">
+        <p style="font-size:13px;margin-bottom:10px;">Enchimento rapido do VE. Som: "Tum-Tum-Tum" (galopinho).</p>
+        <p style="font-size:12px;color:var(--muted);"><strong style="color:var(--navy);">Patologica:</strong> IC, dilatacao VE<br><strong style="color:var(--green);">Fisiologica:</strong> gravidez, criancas, atletas</p>
+        <div class="alert gold" style="margin-top:10px;font-size:12px;"><span>&#128266;</span> Usar CAMPANULA</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head gold"><h3>B4 &mdash; Telediástole</h3></div>
+      <div class="card-body">
+        <p style="font-size:13px;margin-bottom:10px;">Sistole atrial contra VE hipertrofiado. "Ta-Tum-Tum".</p>
+        <p style="font-size:12px;color:var(--muted);"><strong style="color:var(--navy);">Causas:</strong> HAS &middot; Estenose Aortica &middot; CMH<br><strong style="color:var(--green);">Fisiologica:</strong> atleta (investigar!)</p>
+        <div class="alert" style="margin-top:10px;font-size:12px;"><span>&#128683;</span> FA = SEM sistole atrial = SEM B4!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOCOLO -->
+<div id="tab-proto" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">3</div>
+    <div><h2>Protocolo de Diagnostico de Sopros &mdash; 4 Passos</h2><p>Execute nesta ordem. Sempre.</p></div>
+  </div>
+  <div class="proto-grid">
+    <div class="proto-step"><div class="proto-num n1">1</div><div class="proto-body"><h4>Sistolico ou Diastolico?</h4><p>Palpe o pulso enquanto ausculta.<br><strong>Coincide com o pulso = SISTOLICO</strong></p></div></div>
+    <div class="proto-step"><div class="proto-num n2">2</div><div class="proto-body"><h4>Camara D ou E?</h4><p>Manobra de Rivero-Carvalho:<br>Inspiracao &rarr; Direita<br>Expiracao &rarr; Esquerda</p></div></div>
+    <div class="proto-step"><div class="proto-num n3">3</div><div class="proto-body"><h4>Foco de Maior Intensidade?</h4><p>Onde o sopro e mais forte:<br>Mitral &middot; Aortico &middot; Pulmonar &middot; Tricuspide</p></div></div>
+    <div class="proto-step"><div class="proto-num n4">4</div><div class="proto-body"><h4>Graduacao + Fremito?</h4><p>Escala 1 a 6 cruzes.<br>Fremito = MINIMO 4/6.<br>Sem fremito = 3/6 ou menos.</p></div></div>
+  </div>
+  <div class="alert" style="margin-top:24px;"><span style="font-size:18px;">&#9888;</span> REGRA DO FREMITO: Fremito palpavel = sopro MINIMO 4/6 &middot; Sem fremito = sopro 3/6 ou menos</div>
+  <div class="card" style="margin-top:24px;">
+    <div class="card-head"><h3>Escala de Graduacao &mdash; 1 a 6</h3></div>
+    <div class="card-body" style="padding:0;">
+      <table class="grau-table">
+        <thead><tr><th>Grau</th><th>Classificacao</th><th>Caracteristica Clinica</th><th>Fremito</th></tr></thead>
+        <tbody>
+          <tr class="grau-low"><td class="grau-num" style="color:#64748B;">1/6</td><td>Muito leve</td><td>Audivel apenas com muito silencio</td><td class="fremito-no">Ausente</td></tr>
+          <tr class="grau-low"><td class="grau-num" style="color:#64748B;">2/6</td><td>Leve</td><td>Audivel com facilidade no foco</td><td class="fremito-no">Ausente</td></tr>
+          <tr class="grau-low"><td class="grau-num" style="color:#64748B;">3/6</td><td>Moderado</td><td>Audivel com clareza &mdash; limite superior sem fremito</td><td class="fremito-no">Ausente</td></tr>
+          <tr class="grau-high"><td class="grau-num" style="color:var(--red);">4/6</td><td><strong>Intenso</strong></td><td>Fremito palpavel. Som muito forte.</td><td class="fremito-yes">&#10003; Presente</td></tr>
+          <tr class="grau-high"><td class="grau-num" style="color:var(--red);">5/6</td><td><strong>Muito intenso</strong></td><td>Audivel SEM estetoscopio no foco ideal</td><td class="fremito-yes">&#10003; Presente</td></tr>
+          <tr class="grau-high"><td class="grau-num" style="color:var(--red);">6/6</td><td><strong>Maximo</strong></td><td>Audivel FORA do torax (qualquer regiao)</td><td class="fremito-yes">&#10003; Presente</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FISIOPATOLOGIA -->
+<div id="tab-fisio" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">4</div>
+    <div><h2>Fisiopatologia das Valvopatias</h2><p>Entenda o mecanismo antes de memorizar o sopro</p></div>
+  </div>
+  <div class="vs-grid" style="margin-bottom:24px;">
+    <div class="vs-col left">
+      <div class="vs-head" style="color:var(--red);">Insuficiencia / Regurgitacao</div>
+      <div class="vs-sub">Valva devia estar FECHADA... e nao consegue</div>
+      <div class="vs-item">Sangue reflui &rarr; turbulencia</div>
+      <div class="vs-item">&rarr; Sopro de regurgitacao</div>
+      <div class="vs-item">Sons de ALTA frequencia</div>
+      <div class="vs-mnemonic">&#128309; DIAFRAGMA<br><span style="font-weight:400">Ex: Insuf. Mitral (sistole) &middot; Insuf. Aortica (diastole)</span></div>
+    </div>
+    <div class="vs-divider">VS</div>
+    <div class="vs-col right">
+      <div class="vs-head" style="color:var(--blue);">Estenose / Ejecao</div>
+      <div class="vs-sub">Valva devia estar ABERTA... e nao abre por completo</div>
+      <div class="vs-item">Canal estreito &rarr; turbulencia</div>
+      <div class="vs-item">&rarr; Sopro ejetivo</div>
+      <div class="vs-item">Sons de BAIXA frequencia</div>
+      <div class="vs-mnemonic">&#128308; CAMPANULA<br><span style="font-weight:400">Ex: Estenose Mitral (diastole) &middot; Estenose Aortica (sistole)</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Estado das Valvas no Ciclo Cardiaco</h3></div>
+    <div class="card-body" style="padding:0;">
+      <table class="valva-table">
+        <thead><tr>
+          <th style="background:#64748B;text-align:left;padding-left:20px;">Valva</th>
+          <th style="background:var(--red);">Na Sistole</th>
+          <th style="background:var(--blue);">Na Diastole</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="text-align:left;padding-left:20px;font-weight:600;">Mitral</td><td style="background:#FDEDEC;color:var(--red);">FECHADA</td><td style="background:#EAFAF1;color:var(--green);">ABERTA</td></tr>
+          <tr><td style="text-align:left;padding-left:20px;font-weight:600;">Tricuspide</td><td style="background:#FDEDEC;color:var(--red);">FECHADA</td><td style="background:#EAFAF1;color:var(--green);">ABERTA</td></tr>
+          <tr><td style="text-align:left;padding-left:20px;font-weight:600;">Aortica</td><td style="background:#EAFAF1;color:var(--green);">ABERTA</td><td style="background:#FDEDEC;color:var(--red);">FECHADA</td></tr>
+          <tr><td style="text-align:left;padding-left:20px;font-weight:600;">Pulmonar</td><td style="background:#EAFAF1;color:var(--green);">ABERTA</td><td style="background:#FDEDEC;color:var(--red);">FECHADA</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="alert blue" style="margin-top:20px;">
+    <span style="font-size:18px;">&#128161;</span>
+    <div><strong>Regra Logica:</strong><br>Valva devia estar FECHADA e nao ficou &rarr; INSUFICIENCIA (sangue volta)<br>Valva devia estar ABERTA e nao abriu &rarr; ESTENOSE (canal estreito)</div>
+  </div>
+</div>
+
+<!-- INSUFICIENCIA AORTICA -->
+<div id="tab-ia" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">5</div>
+    <div><h2>Insuficiencia Aortica &mdash; Sinais Perifericos</h2><p>Regurgitacao diastolica &rarr; volume extra no VE &rarr; ejecao amplificada &rarr; grandes amplitudes de pulso</p></div>
+  </div>
+  <div class="card">
+    <div class="card-head red"><h3>5 Sinais Clinicos &mdash; Reconheca a Beira do Leito</h3></div>
+    <div class="card-body">
+      <div class="sinal-row">
+        <div><div class="sinal-name">Sinal de Musset</div><div class="sinal-loc">&#128205; Cabeca</div></div>
+        <div class="sinal-desc">Balanco cefalico no ritmo cardiaco &mdash; a cabeca "balanca" com cada batimento</div>
+        <div class="sinal-memo">Musset = Movimento</div>
+      </div>
+      <div class="sinal-row">
+        <div><div class="sinal-name">Sinal de Miller</div><div class="sinal-loc">&#128205; Uvula / Boca</div></div>
+        <div class="sinal-desc">Pulsatilidade visivel da uvula ao ritmo cardiaco</div>
+        <div class="sinal-memo">Miller Beer = Boca</div>
+      </div>
+      <div class="sinal-row">
+        <div><div class="sinal-name">Pulso em Martelo d'Agua</div><div class="sinal-loc">&#128205; Pulso periferico</div></div>
+        <div class="sinal-desc">Pulso amplo e de colapso rapido &mdash; sobe e cai abruptamente (hiperfluxo arterial)</div>
+        <div class="sinal-memo">Hiperfluxo arterial</div>
+      </div>
+      <div class="sinal-row">
+        <div><div class="sinal-name">Sinal de Kink</div><div class="sinal-loc">&#128205; Ungueal / Dedo</div></div>
+        <div class="sinal-desc">Pulsatilidade visivel no leito ungueal &mdash; pressione levemente a ponta do dedo</div>
+        <div class="sinal-memo">Kink = dedo</div>
+      </div>
+      <div class="sinal-row">
+        <div><div class="sinal-name">Tiro de Pistola (Shotgun)</div><div class="sinal-loc">&#128205; Arteria femoral</div></div>
+        <div class="sinal-desc">Sopro sistolico de alta intensidade na femoral por hiperfluxo &mdash; ausculte a virilha!</div>
+        <div class="sinal-memo">Auscultar a femoral!</div>
+      </div>
+    </div>
+  </div>
+  <div class="alert gold" style="margin-top:20px;">
+    <span style="font-size:18px;">&#129504;</span>
+    <div>Mecanismo unico: <strong>regurgitacao diastolica &rarr; VE cheio &rarr; ejecao sistolica amplificada &rarr; grandes oscilacoes de pressao em toda a arvore arterial.</strong></div>
+  </div>
+</div>
+
+<!-- PRONTUARIO -->
+<div id="tab-pront" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">6</div>
+    <div><h2>Como Descrever a Ausculta no Prontuario</h2><p>Linguagem tecnica, objetiva, reproduzivel</p></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Modelo de Descricao</h3></div>
+    <div class="card-body">
+      <div class="prontuario-block"><span class="label">AC:</span> RCR 2T, BNF, com sopro sistolico em foco mitral 3+/6, sem fremito. <span class="label">AP:</span> MVU, s/RA.</div>
+      <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase;">Abreviacoes</div>
+          <div style="font-size:13px;line-height:2;color:var(--txt);">
+            <strong>RCR</strong> = Ritmo cardiaco regular<br>
+            <strong>2T</strong> = 2 tempos (B1 + B2)<br>
+            <strong>BNF</strong> = Bulhas normofonicas<br>
+            <strong>3+/6</strong> = Sopro grau 3 de 6<br>
+            <strong>MVU</strong> = Murmuro vesicular universal<br>
+            <strong>s/RA</strong> = sem ruidos adventícios
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase;">Variacoes comuns</div>
+          <div style="font-size:13px;line-height:2;color:var(--muted);">
+            IRR 2T = ritmo irregular (ex: FA)<br>
+            BHF = bulhas hiperfonicas<br>
+            BHI = bulhas hipofonicas<br>
+            c/ B3 = com terceira bulha<br>
+            c/ fremito = sopro &ge; 4/6<br>
+            Irradiacao para: axila, pescoco...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <div class="card-head blue"><h3>Exemplos por Diagnostico</h3></div>
+    <div class="card-body">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px;">Insuficiencia Mitral grave:</div>
+          <div class="prontuario-block" style="font-size:12px;">AC: RCR 2T, BNF, com sopro holossistolico em foco mitral 5+/6, com fremito, irradiado para axila.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px;">Insuficiencia Cardiaca com B3:</div>
+          <div class="prontuario-block" style="font-size:12px;">AC: RCR 3T (galope por B3), BNF, sem sopros. Ritmo de galope a ausculta cardiaca.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px;">Fibrilacao Atrial:</div>
+          <div class="prontuario-block" style="font-size:12px;">AC: IRR 2T, BNF, sem sopros. Deficit de pulso presente.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div id="tab-flash" class="tab-content">
+  <div class="sec-title">
+    <div class="sec-num">&#127183;</div>
+    <div><h2>Flashcards Interativos</h2><p>Clique no cartao para ver a resposta &mdash; 35 cartoes</p></div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn on" onclick="filterFC('all',this)">Todos (35)</button>
+    <button class="filter-btn" onclick="filterFC('Estet',this)">Estetoscopio</button>
+    <button class="filter-btn" onclick="filterFC('Bulhas',this)">Bulhas</button>
+    <button class="filter-btn" onclick="filterFC('Proto',this)">Protocolo</button>
+    <button class="filter-btn" onclick="filterFC('Fisio',this)">Fisiopatologia</button>
+    <button class="filter-btn" onclick="filterFC('IA',this)">Insuf. Aortica</button>
+    <button class="filter-btn" onclick="filterFC('Regras',this)">Regras de Ouro</button>
+  </div>
+  <div class="fc-grid" id="fc-grid"></div>
+</div>
+
+<footer>IPEDC &mdash; Instituto de Propedeutica e Educacao em Doencas Cardiovasculares &nbsp;&middot;&nbsp; Aula 03: Sopros e Bulhas Cardiacas &nbsp;&middot;&nbsp; Material de Estudo Pos-Aula &nbsp;&middot;&nbsp; Uso exclusivo dos alunos do Hub Dr. Jorge</footer>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+const cards = [
+  {tag:'Estet',q:'Qual peca do estetoscopio usar para B3 e B4?',a:'CAMPANULA - peca menor, sons de baixa frequencia. Pressao leve sobre a pele.'},
+  {tag:'Estet',q:'Qual peca usar para B1 e B2?',a:'DIAFRAGMA - peca maior, sons de alta frequencia. Pressao firme.'},
+  {tag:'Estet',q:'A campanula e usada para estenose ou regurgitacao?',a:'Estenose (sopros ejetivos, baixa frequencia). Regurgitacao usa diafragma.'},
+  {tag:'Estet',q:'Macete: CAMPANULA = ?',a:'CANTINHO - sons que precisam de silencio e atencao (baixa frequencia).'},
+  {tag:'Bulhas',q:'O que causa B1?',a:'Fechamento das valvas Mitral + Tricuspide - inicio da sistole.'},
+  {tag:'Bulhas',q:'B1 coincide com o pulso?',a:'SIM. B1 = inicio da sistole = pulso carotideo. Use isso para definir sistolico vs diastolico.'},
+  {tag:'Bulhas',q:'O que causa B2?',a:'Fechamento das valvas Aortica + Pulmonar - inicio da diastole. NAO coincide com o pulso.'},
+  {tag:'Bulhas',q:'Em que momento do ciclo ocorre B3?',a:'Protodiástole - fase de enchimento rapido do VE. Som: "Tum-Tum-Tum" (galopinho).'},
+  {tag:'Bulhas',q:'B3 e sempre patologica?',a:'Nao. Pode ser fisiologica em gravidas, criancas e atletas. Patologica em IC e dilatacao do VE.'},
+  {tag:'Bulhas',q:'Em que momento do ciclo ocorre B4?',a:'Telediástole (pre-sistolica) - sistole atrial contra VE hipertrofiado. Som: "Ta-Tum-Tum".'},
+  {tag:'Bulhas',q:'Por que nao existe B4 na Fibrilacao Atrial?',a:'FA = sem sistole atrial = sem contracao do atrio = sem B4. Regra absoluta, sem excecao.'},
+  {tag:'Bulhas',q:'Qual bulha usar CAMPANULA?',a:'B3 e B4 - sons de baixa frequencia gerados no enchimento ventricular.'},
+  {tag:'Proto',q:'Passo 1: como definir sistolico vs diastolico?',a:'Palpe o pulso enquanto ausculta. Coincide com o pulso = SISTOLICO.'},
+  {tag:'Proto',q:'Passo 2: como diferenciar camara D de camara E?',a:'Manobra de Rivero-Carvalho: Inspiracao amplifica lado D. Expiracao amplifica lado E.'},
+  {tag:'Proto',q:'Passo 4: qual e a regra do fremito?',a:'Fremito palpavel = sopro MINIMO 4/6. Sem fremito = sopro 3/6 ou menos.'},
+  {tag:'Proto',q:'Sopro 5/6 - o que significa?',a:'Audivel SEM estetoscopio no foco ideal. Fremito presente.'},
+  {tag:'Proto',q:'Sopro 6/6 - o que significa?',a:'Audivel FORA do torax em qualquer regiao. Fremito sempre presente.'},
+  {tag:'Proto',q:'Sopro 1/6 - o que significa?',a:'Muito leve, audivel apenas com muito silencio e concentracao maxima. Sem fremito.'},
+  {tag:'Fisio',q:'Qual o mecanismo de geracao de sopros?',a:'Fluxo turbulento pelo orificio valvar - seja por valva que nao fechou (insuf.) ou nao abriu (estenose).'},
+  {tag:'Fisio',q:'Insuficiencia mitral: em que fase do ciclo ocorre o sopro?',a:'Sistole - a valva mitral devia estar FECHADA. Como nao fecha, sangue reflui para o AE.'},
+  {tag:'Fisio',q:'Estenose aortica: em que fase ocorre o sopro?',a:'Sistole - valva aortica devia estar ABERTA para ejetar sangue. Como nao abre bem, sopro ejetivo sistolico.'},
+  {tag:'Fisio',q:'Estenose mitral: em que fase ocorre o sopro?',a:'Diastole - valva mitral devia estar ABERTA para encher o VE. Ruflar diastolico.'},
+  {tag:'Fisio',q:'Insuficiencia aortica: em que fase ocorre o sopro?',a:'Diastole - valva aortica devia estar FECHADA. Sangue regurgita para o VE. Sopro diastolico.'},
+  {tag:'IA',q:'Qual o mecanismo geral dos sinais perifericos da IA?',a:'Regurgitacao diastolica -> VE cheio -> ejecao sistolica amplificada -> grandes oscilacoes de pressao arterial.'},
+  {tag:'IA',q:'Sinal de Musset: onde e o que e?',a:'CABECA - balanco cefalico no ritmo cardiaco. Musset = Movimento.'},
+  {tag:'IA',q:'Sinal de Miller: onde e o que e?',a:'UVULA - pulsatilidade visivel da uvula. Miller Beer = Boca.'},
+  {tag:'IA',q:'Pulso em Martelo de Agua: onde e o que e?',a:'PULSO PERIFERICO - pulso amplo e de colapso rapido (hiperfluxo arterial).'},
+  {tag:'IA',q:'Sinal de Kink: onde e o que e?',a:'UNGUEAL (dedo) - pulsatilidade visivel no leito ungueal. Kink = dedo.'},
+  {tag:'IA',q:'Tiro de Pistola (Shotgun): onde e como se detecta?',a:'ARTERIA FEMORAL - sopro sistolico de alta intensidade por hiperfluxo. Ausculte a virilha!'},
+  {tag:'Regras',q:'Regra de Ouro 1 - Como definir sistolico/diastolico?',a:'Palpe o pulso durante a ausculta. O que coincide com o pulso e SISTOLICO.'},
+  {tag:'Regras',q:'Regra de Ouro 2 - Manobra de Rivero-Carvalho',a:'Inspiracao -> camara Direita. Expiracao -> camara Esquerda.'},
+  {tag:'Regras',q:'Regra de Ouro 3 - Fremito',a:'Fremito palpavel = minimo 4/6. Sem fremito = 3/6 ou menos.'},
+  {tag:'Regras',q:'Regra de Ouro 4 - FA e B4',a:'Fibrilacao Atrial = SEM B4. Sempre. FA elimina a sistole atrial.'},
+  {tag:'Regras',q:'Regra de Ouro 5 - Estetoscopio certo',a:'Insuf./Regurgitacao = DIAFRAGMA. Estenose = CAMPANULA.'},
+  {tag:'Regras',q:'Regra de Ouro 6 - 5 sinais da IA',a:'Musset (cabeca) - Miller (uvula) - Kink (ungueal) - Martelo de Agua (pulso) - Shotgun (femoral).'},
+];
+function renderCards(filter) {
+  const grid = document.getElementById('fc-grid');
+  grid.innerHTML = '';
+  const list = filter === 'all' ? cards : cards.filter(c => c.tag === filter);
+  list.forEach(c => {
+    const wrap = document.createElement('div');
+    wrap.className = 'fc-wrap';
+    wrap.innerHTML = '<div class="fc-inner"><div class="fc-front"><div class="fc-tag">'+c.tag+'</div><div class="fc-q">'+c.q+'</div><div class="fc-hint">clique para ver</div></div><div class="fc-back"><div class="fc-a">'+c.a+'</div><div class="fc-hint" style="color:var(--green)">resposta</div></div></div>';
+    wrap.addEventListener('click', () => wrap.classList.toggle('flipped'));
+    grid.appendChild(wrap);
+  });
+}
+function filterFC(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderCards(tag);
+}
+renderCards('all');
+</script>
+</body>
+</html>
